@@ -1,0 +1,70 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+section {
+	display: flex;
+	flex-direction: row;
+}
+hr {
+	border: 0;
+	height: 1px;
+	background-image: linear-gradient(to right, #fff, rgba(0, 0, 0, 0.75), #fff);
+}
+svg {
+	height: 400px;
+	width: 400px;
+	margin: auto;
+	display: flex;
+	justify-content: center;
+}
+text {
+	fill: #fff;
+	font-size: 35px;
+}
+#map-container {
+	background: url("assets/lake_bg.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	height: 400px;
+	width: 500px;
+}
+#map {
+	margin: auto;
+	display: flex;
+	justify-content: center;
+}
+#bar-graph-container {
+	margin: auto;
+	display: flex;
+	justify-content: center;
+}
+/* #sensor-1 {
+	fill: rgb(136, 200, 247);
+}
+#sensor-2 {
+	fill: rgb(17, 146, 238);
+}
+#sensor-3 {
+	fill: rgb(12, 102, 167);
+} */
+.lake-part {
+	/* fill: rgb(255, 153, 153, 0.6); */
+	fill: #88c8f7;
+	cursor: pointer;
+}
+.lake-part:hover {
+	fill: #1192ee !important;
+}
+@media only screen and (max-width: 600px) {
+	#map-container {
+		height: 200px;
+		width: 200px;
+	}
+}
+@media screen and (max-width: 1199px) and (min-width: 599px) {
+}
+@media screen and (max-width: 99999px) and (min-width: 1200px) {
+}

@@ -22,6 +22,19 @@ text {
 	stroke-linejoin: miter;
 	paint-order: stroke;
 }
+stop {
+	transition: 0.4s ease-in-out;
+}
+::-webkit-scrollbar {
+	width: 10px !important;
+}
+::-webkit-scrollbar-thumb {
+	background: #e3f2fd;
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #0c66a7;
+}
 #jumbotron {
 	background: url("assets/bg.jpg");
 	background-position: center;
@@ -73,33 +86,31 @@ h1 {
 	max-width: 600px;
 }
 #sensor-1 {
-	cursor: pointer;
-	transition: fill 0.3s ease-out;
 	fill: url(#grad1);
 }
 #sensor-2 {
 	fill: url(#grad2);
-	cursor: pointer;
-	transition: fill 0.3s ease-out;
 }
 
 #sensor-3 {
 	fill: url(#grad3);
-	cursor: pointer;
-	transition: fill 0.3s ease-out;
 }
-.lake-part:hover {
+path {
+	cursor: pointer;
+	transition: 0.4s ease-out !important;
+}
+path:hover {
 	stroke: #000;
 	stroke-width: 6;
 	/* fill: #9cc0fa !important; */
-	/* fill: transparent ; */
+	/* fill: transparent !important; */
 }
 .btn-outline-primary {
-	border-color: #9cc0fa !important;
+	border-color: #e3f2fd !important;
 	color: #000 !important;
 }
 .btn-outline-primary:hover {
-	background-color: #9cc0fa !important;
+	background-color: #e3f2fd !important;
 }
 @media only screen and (max-width: 600px) {
 	#map-bar-container {
@@ -108,6 +119,20 @@ h1 {
 	}
 	#bar-chart {
 		width: 55vw !important;
+	}
+	#jumbotron {
+		height: 500px;
+	}
+	#tadlac-lake {
+		height: 300px;
+		width: 300px;
+		margin: auto;
+		display: flex;
+		justify-content: center;
+	}
+	#map-container {
+		height: 300px;
+		width: 300px;
 	}
 }
 @media screen and (max-width: 900px) and (min-width: 599px) {

@@ -6,12 +6,12 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
 		<link rel="stylesheet" href="style.css" />
-		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js"></script>
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 			rel="stylesheet"
 		/>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	</head>
 	<body>
@@ -71,7 +71,7 @@
 		</div>
 		<div class="dropdown d-flex justify-content-center mb-4">
 			<button
-				class="btn dropdown-toggle"
+				class="btn dropdown-toggle clickable"
 				type="button"
 				id="dropdownMenu"
 				data-bs-toggle="dropdown"
@@ -87,7 +87,7 @@
 						class="dropdown-item"
 						type="button"
 					>
-						Temparature
+						Temperature
 					</button>
 				</li>
 				<li>
@@ -137,17 +137,14 @@
 				>
 					<g>
 						<path
-							class="lake-part"
 							id="sensor-1"
 							d="M 244.54 819.25 199.56 824.94 153.54 809.71 104.81 773.49 75.47 751.09 63.2 722.49 55.69 705.06 58.25 691.6 66.49 670.78 49.98 649.78 49.78 637.2 36.97 623.94 25.95 625.42 1 487.15 23.98 369.43 60.67 272.87 103.91 225.86 122.92 209.35 157.64 145.83 191.72 105.82 274.26 70.24 334.16 423.22 244.54 819.25 Z"
 						/>
 						<path
-							class="lake-part"
 							id="sensor-2"
 							d="M 334.16 423.22 274.26 70.24 311.4 64.8 461.13 36.84 561.9 16.25 622.18 1 667.39 2.27 694.25 11.79 722.42 58.79 730.29 102 746.67 147.74 774.18 217.6 784.66 272.87 787.24 321.88 799 366.12 797.26 429.67 334.16 423.22 Z"
 						/>
 						<path
-							class="lake-part"
 							id="sensor-3"
 							d="M 797.26 429.67 786.76 510.16 758.16 566.97 723.16 597.1 710.7 633.86 699.33 684.78 688.51 705.25 652.77 735.7 607.82 757.23 562.89 753.54 547.82 749.46 524.44 742.52 463.8 770.86 456.76 780.32 458.93 792.91 396.66 827.04 340.35 826.52 285.12 818.11 244.54 819.25 334.16 423.22 797.26 429.67 Z"
 						/>
@@ -162,9 +159,21 @@
 							cx="50%"
 							cy="50%"
 						>
-							<stop offset="0%" style="stop-color: #800000" />
-							<stop offset="10%" style="stop-color: #ff0000" />
-							<stop offset="100%" style="stop-color: #fff" />
+							<stop
+								id="sensor1-stop-0"
+								offset="0%"
+								style="stop-color: #9cc0fa"
+							/>
+							<stop
+								id="sensor1-stop-10"
+								offset="10%"
+								style="stop-color: #9cc0fa"
+							/>
+							<stop
+								id="sensor1-stop-100"
+								offset="100%"
+								style="stop-color: #fff"
+							/>
 						</radialGradient>
 					</defs>
 					<defs>
@@ -176,9 +185,21 @@
 							cx="65%"
 							cy="65%"
 						>
-							<stop offset="0%" style="stop-color: #800000" />
-							<stop offset="10%" style="stop-color: #ff0000" />
-							<stop offset="100%" style="stop-color: #fff" />
+							<stop
+								id="sensor2-stop-0"
+								offset="0%"
+								style="stop-color: #9cc0fa"
+							/>
+							<stop
+								id="sensor2-stop-10"
+								offset="10%"
+								style="stop-color: #9cc0fa"
+							/>
+							<stop
+								id="sensor2-stop-100"
+								offset="100%"
+								style="stop-color: #fff"
+							/>
 						</radialGradient>
 					</defs>
 					<defs>
@@ -190,9 +211,21 @@
 							cx="65%"
 							cy="65%"
 						>
-							<stop offset="0%" style="stop-color: #800000" />
-							<stop offset="10%" style="stop-color: #ff0000" />
-							<stop offset="100%" style="stop-color: #fff" />
+							<stop
+								id="sensor3-stop-0"
+								offset="0%"
+								style="stop-color: #9cc0fa"
+							/>
+							<stop
+								id="sensor3-stop-10"
+								offset="10%"
+								style="stop-color: #9cc0fa"
+							/>
+							<stop
+								id="sensor3-stop-100"
+								offset="100%"
+								style="stop-color: #fff"
+							/>
 						</radialGradient>
 					</defs>
 
@@ -228,7 +261,7 @@
 				></canvas>
 			</div>
 			<div class="dropdown d-flex justify-content-center my-4">
-				<button class="btn btn-outline-primary" id="play-btn">
+				<button class="btn btn-outline-primary clickable" id="play-btn">
 					Play
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

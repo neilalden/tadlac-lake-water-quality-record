@@ -3,21 +3,54 @@ const dropdownItemTemperature = document.getElementById("dropdown-item-temperatu
 const dropdownItemPHLevel = document.getElementById("dropdown-item-ph-level");
 const dropdownItemAmmoniaLevel = document.getElementById("dropdown-item-ammonia-level");
 const dropdownItemOxygenLevel = document.getElementById("dropdown-item-oxygen-level");
-const dropdownMenuSelected = document.getElementById("dropdown-menu-selected");
+const playBtn = document.getElementById("play-btn");
 const barChart = document.getElementById("bar-chart");
 const lineChart = document.getElementById("line-chart");
+const dropdownMenuSelected = document.getElementById("dropdown-menu-selected");
+const sensor1Stop0 = document.getElementById("sensor1-stop-0");
+const sensor2Stop0 = document.getElementById("sensor2-stop-0");
+const sensor3Stop0 = document.getElementById("sensor3-stop-0");
+const sensor1Stop10 = document.getElementById("sensor1-stop-10");
+const sensor2Stop10 = document.getElementById("sensor2-stop-10");
+const sensor3Stop10 = document.getElementById("sensor3-stop-10");
+const clickable = document.getElementsByClassName("clickable");
+// CONSTANTS
+const ANIMATIONSPEED = 500;
+const DAYS = 14;
+const TEMPERATURE = {
+    name: "Temperature",
+    minVal: 15,
+    maxVal: 30,
+};
+const PHLEVEL = {
+    name: "pH level",
+    minVal: 6,
+    maxVal: 9,
+};
+const AMMONIALEVEL = {
+    name: "Ammonia level",
+    minVal: 7,
+    maxVal: 12,
+};
+const OXYGENLEVEL = {
+    name: "Oxygen level",
+    minVal: 2,
+    maxVal: 5,
+};
 // SIDE EFFECT VARIABLES
 let barChartCanvas;
 let lineChartCanvas;
+let dataTemp;
+let parameterTemp;
 // SIDE EFFECT FUNCTIONS
-const renderBarChart = (parameter, arrData) => {
+const renderBarChart = (parameter, dataArr) => {
     const labels = ["Sensor 1", "Sensor 2", "Sensor 3"];
     const data = {
         labels: labels,
         datasets: [
             {
                 label: parameter,
-                data: [arrData[0], arrData[1], arrData[2]],
+                data: [dataArr[0], dataArr[1], dataArr[2]],
                 backgroundColor: [
                     "rgba(136, 200, 247, 0.2)",
                     "rgba(17, 146, 238, 0.2)",
@@ -36,6 +69,7 @@ const renderBarChart = (parameter, arrData) => {
         type: "bar",
         data: data,
         options: {
+            animation: { duration: 400 },
             scales: {
                 y: {
                     beginAtZero: true,
@@ -51,11 +85,11 @@ const renderBarChart = (parameter, arrData) => {
     // @ts-ignore
     barChartCanvas = new Chart(barChart, config);
 };
-const renderLineChart = (parameter, arrData) => {
-    const sensor1 = arrData.map((i) => i[0]);
-    const sensor2 = arrData.map((i) => i[1]);
-    const sensor3 = arrData.map((i) => i[2]);
-    const labels = arrData.map((i, index) => `Day ${index + 1}`);
+const renderLineChart = (parameter, dataArr, index = null) => {
+    const sensor1 = dataArr.map((i) => i[0]);
+    const sensor2 = dataArr.map((i) => i[1]);
+    const sensor3 = dataArr.map((i) => i[2]);
+    const labels = dataArr.map((i, index) => `Day ${index + 1}`);
     const data = {
         labels: labels,
         datasets: [
@@ -83,6 +117,7 @@ const renderLineChart = (parameter, arrData) => {
         ],
     };
     const options = {
+        animation: false,
         plugins: {
             autocolors: false,
             annotation: {
@@ -90,15 +125,10 @@ const renderLineChart = (parameter, arrData) => {
                     line1: {
                         type: "line",
                         mode: "vertical",
-                        xMin: 13,
-                        xMax: 13,
+                        xMin: index != null ? index : dataArr.length - 1,
+                        xMax: index != null ? index : dataArr.length - 1,
                         borderColor: "red",
-                        borderWidth: 2,
-                        // label: {
-                        // 	content: "TODAY",
-                        // 	enabled: true,
-                        // 	position: "bottom",
-                        // },
+                        borderWidth: 3,
                     },
                 },
             },
@@ -121,16 +151,72 @@ const selectParameter = (e) => {
     const text = e.target.innerText;
     dropdownMenuSelected.innerText = text;
     let dummyData;
-    if (text === "Temperature")
-        dummyData = generateDailyDummyData(14, 20, 30);
-    if (text === "pH level")
-        dummyData = generateDailyDummyData(14, 7, 8);
-    if (text === "Ammonia level")
-        dummyData = generateDailyDummyData(14, 7, 12);
-    if (text === "Oxygen level")
-        dummyData = generateDailyDummyData(14, 2, 5);
+    if (text === TEMPERATURE.name)
+        dummyData = generateDailyDummyData(DAYS, TEMPERATURE.minVal, TEMPERATURE.maxVal);
+    if (text === PHLEVEL.name)
+        dummyData = generateDailyDummyData(DAYS, PHLEVEL.minVal, PHLEVEL.maxVal);
+    if (text === AMMONIALEVEL.name)
+        dummyData = generateDailyDummyData(DAYS, AMMONIALEVEL.minVal, AMMONIALEVEL.maxVal);
+    if (text === OXYGENLEVEL.name)
+        dummyData = generateDailyDummyData(DAYS, OXYGENLEVEL.minVal, OXYGENLEVEL.maxVal);
+    parameterTemp = text;
+    dataTemp = dummyData;
     renderBarChart(text, dummyData[0]);
     renderLineChart(text, dummyData);
+};
+const disableClickables = (isClickable) => {
+    for (let i = 0; i < clickable.length; i++) {
+        clickable[i].disabled = isClickable;
+    }
+};
+const animateMap = (data) => {
+    const COLOR0 = ["#b3b300", "#b39800", "#b37400", "#b33000", "#800000"];
+    const COLOR10 = ["yellow", "gold", "orange", "#ff4500", "red"];
+    let sensor1Stop0Color, sensor2Stop0Color, sensor3Stop0Color, sensor1Stop10Color, sensor2Stop10Color, sensor3Stop10Color;
+    for (let i = 15, j = 0; i <= 30; i += 3, j++) {
+        if (i < data[0]) {
+            sensor1Stop0Color = COLOR0[j];
+            sensor1Stop10Color = COLOR10[j];
+        }
+        if (i < data[1]) {
+            sensor2Stop0Color = COLOR0[j];
+            sensor2Stop10Color = COLOR10[j];
+        }
+        if (i < data[2]) {
+            sensor3Stop0Color = COLOR0[j];
+            sensor3Stop10Color = COLOR10[j];
+        }
+    }
+    if (data[0] >= 30) {
+        sensor1Stop0Color = COLOR0[COLOR0.length - 1];
+        sensor1Stop10Color = COLOR10[COLOR10.length - 1];
+    }
+    if (data[1] >= 30) {
+        sensor2Stop0Color = COLOR0[COLOR0.length - 1];
+        sensor2Stop10Color = COLOR10[COLOR10.length - 1];
+    }
+    if (data[2] >= 30) {
+        sensor3Stop0Color = COLOR0[COLOR0.length - 1];
+        sensor3Stop10Color = COLOR10[COLOR10.length - 1];
+    }
+    sensor1Stop0.setAttribute("style", `stop-color: ${sensor1Stop0Color}`);
+    sensor2Stop0.setAttribute("style", `stop-color: ${sensor2Stop0Color}`);
+    sensor3Stop0.setAttribute("style", `stop-color: ${sensor3Stop0Color}`);
+    sensor1Stop10.setAttribute("style", `stop-color: ${sensor1Stop10Color}`);
+    sensor2Stop10.setAttribute("style", `stop-color: ${sensor2Stop10Color}`);
+    sensor3Stop10.setAttribute("style", `stop-color: ${sensor3Stop10Color}`);
+};
+const playAnimation = () => {
+    disableClickables(true);
+    for (let i = 0; i < DAYS; i++) {
+        setTimeout(() => {
+            animateMap(dataTemp[i]);
+            renderLineChart(parameterTemp, dataTemp, i);
+            renderBarChart(parameterTemp, dataTemp[i]);
+            if (i === DAYS - 1)
+                disableClickables(false);
+        }, i * ANIMATIONSPEED);
+    }
 };
 // FRUITFUL FUNCTIONS
 const generateDailyDummyData = (days, min, max) => {
@@ -149,10 +235,13 @@ const generateDailyDummyData = (days, min, max) => {
 };
 // EVENT LISTENERS
 window.addEventListener("load", (e) => {
-    const dummyData = generateDailyDummyData(14, 20, 30);
-    renderBarChart("Temperature", dummyData[0]);
-    renderLineChart("Temperature", dummyData);
+    const dummyData = generateDailyDummyData(DAYS, TEMPERATURE.minVal, TEMPERATURE.maxVal);
+    parameterTemp = TEMPERATURE.name;
+    dataTemp = dummyData;
+    renderBarChart(TEMPERATURE.name, dummyData[0]);
+    renderLineChart(TEMPERATURE.name, dummyData);
 });
+playBtn.addEventListener("click", playAnimation);
 dropdownItemTemperature.addEventListener("click", (e) => selectParameter(e));
 dropdownItemPHLevel.addEventListener("click", (e) => selectParameter(e));
 dropdownItemAmmoniaLevel.addEventListener("click", (e) => selectParameter(e));

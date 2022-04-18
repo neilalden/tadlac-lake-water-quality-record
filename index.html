@@ -5,38 +5,22 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
-
-		<script type="text/javascript" src="lib/binaryajax.js"></script>
-		<script type="text/javascript" src="src/binarywrapper.js"></script>
-		<script type="text/javascript" src="src/shapefile.js"></script>
-		<script type="text/javascript" src="src/dbf.js"></script>
+		<link rel="stylesheet" href="style.css" />
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js"></script>
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 			rel="stylesheet"
-			integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-			crossorigin="anonymous"
 		/>
-		<script
-			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-			integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-			integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-			crossorigin="anonymous"
-		></script>
-		<link rel="stylesheet" href="style.css" />
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	</head>
 	<body>
 		<nav
-			class="navbar navbar-light navbar-expand-lg"
+			class="navbar navbar-light navbar-expand-lg d-flex justify-content-center"
 			style="background-color: #e3f2fd"
 		>
 			<div class="container-fluid">
-				<a class="navbar-brand" href="#">Navbar</a>
+				<a class="navbar-brand" href="#">Logo</a>
 				<button
 					class="navbar-toggler"
 					type="button"
@@ -51,33 +35,13 @@
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item">
-							<a class="nav-link active" aria-current="page" href="#">Home</a>
+							<a class="nav-link active" aria-current="page" href="#">Link</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="#">Link</a>
 						</li>
-						<li class="nav-item dropdown">
-							<a
-								class="nav-link dropdown-toggle"
-								href="#"
-								id="navbarDropdown"
-								role="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false"
-							>
-								Dropdown
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-								<li><a class="dropdown-item" href="#">Action</a></li>
-								<li><a class="dropdown-item" href="#">Another action</a></li>
-								<li><hr class="dropdown-divider" /></li>
-								<li>
-									<a class="dropdown-item" href="#">Something else here</a>
-								</li>
-							</ul>
-						</li>
 						<li class="nav-item">
-							<a class="nav-link disabled">Disabled</a>
+							<a class="nav-link" href="#">Link</a>
 						</li>
 					</ul>
 					<form class="d-flex">
@@ -94,9 +58,9 @@
 				</div>
 			</div>
 		</nav>
-		<div class="container my-4">
-			<h1 class="text-center">Tadlac Lake Water Quality Record</h1>
-			<p class="text-center">
+		<div class="p-5 mb-4 bg-secondary text-white" id="jumbotron">
+			<h1>Tadlac Lake Water Quality Record</h1>
+			<p>
 				Lorem ipsum dolor, sit amet consectetur adipisicing elit. Suscipit,
 				veritatis repudiandae sapiente eum nobis sunt, reiciendis sint totam
 				architecto perspiciatis nam nulla ab voluptatibus, exercitationem earum
@@ -105,8 +69,60 @@
 				labore dolorum nemo odio possimus veritatis reprehenderit consequatur.
 			</p>
 		</div>
-		<hr class="my-4" />
-		<section class="container d-flex justify-content-between">
+		<div class="dropdown d-flex justify-content-center mb-4">
+			<button
+				class="btn dropdown-toggle"
+				type="button"
+				id="dropdownMenu"
+				data-bs-toggle="dropdown"
+				aria-expanded="false"
+			>
+				Parameter:
+				<span id="dropdown-menu-selected">Temperature</span>
+			</button>
+			<ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+				<li>
+					<button
+						id="dropdown-item-temperature"
+						class="dropdown-item"
+						type="button"
+					>
+						Temparature
+					</button>
+				</li>
+				<li>
+					<button
+						id="dropdown-item-ph-level"
+						class="dropdown-item"
+						type="button"
+					>
+						pH level
+					</button>
+				</li>
+				<li>
+					<button
+						id="dropdown-item-ammonia-level"
+						class="dropdown-item"
+						type="button"
+					>
+						Ammonia level
+					</button>
+				</li>
+				<li>
+					<button
+						id="dropdown-item-oxygen-level"
+						class="dropdown-item"
+						type="button"
+					>
+						Oxygen level
+					</button>
+				</li>
+			</ul>
+		</div>
+		<section
+			id="map-bar-container"
+			class="container d-flex justify-content-between my-4"
+		>
 			<div id="map-container">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -117,8 +133,9 @@
 					viewBox="0 0 800 828"
 					stroke-linecap="round"
 					stroke-linejoin="round"
+					id="tadlac-lake"
 				>
-					<g id="tadlak_lake">
+					<g>
 						<path
 							class="lake-part"
 							id="sensor-1"
@@ -135,70 +152,100 @@
 							d="M 797.26 429.67 786.76 510.16 758.16 566.97 723.16 597.1 710.7 633.86 699.33 684.78 688.51 705.25 652.77 735.7 607.82 757.23 562.89 753.54 547.82 749.46 524.44 742.52 463.8 770.86 456.76 780.32 458.93 792.91 396.66 827.04 340.35 826.52 285.12 818.11 244.54 819.25 334.16 423.22 797.26 429.67 Z"
 						/>
 					</g>
+					<!-- heatmap gradient -->
 					<defs>
-						<clipPath id="myCircle">
-							<circle cx="350" cy="290" r="200" />
-						</clipPath>
+						<radialGradient
+							id="grad1"
+							fx="0%"
+							fy="50%"
+							r="150%"
+							cx="50%"
+							cy="50%"
+						>
+							<stop offset="0%" style="stop-color: #800000" />
+							<stop offset="10%" style="stop-color: #ff0000" />
+							<stop offset="100%" style="stop-color: #fff" />
+						</radialGradient>
+					</defs>
+					<defs>
+						<radialGradient
+							id="grad2"
+							fx="75%"
+							fy="0%"
+							r="150%"
+							cx="65%"
+							cy="65%"
+						>
+							<stop offset="0%" style="stop-color: #800000" />
+							<stop offset="10%" style="stop-color: #ff0000" />
+							<stop offset="100%" style="stop-color: #fff" />
+						</radialGradient>
+					</defs>
+					<defs>
+						<radialGradient
+							id="grad3"
+							fx="75%"
+							fy="75%"
+							r="150%"
+							cx="65%"
+							cy="65%"
+						>
+							<stop offset="0%" style="stop-color: #800000" />
+							<stop offset="10%" style="stop-color: #ff0000" />
+							<stop offset="100%" style="stop-color: #fff" />
+						</radialGradient>
 					</defs>
 
+					<!-- location pin -->
+					<defs>
+						<clipPath id="location-pin">
+							<circle cx="350" cy="290" r="400" />
+						</clipPath>
+					</defs>
 					<image
 						width="50"
 						height="80"
 						xlink:href="assets/Google_Maps_pin.svg"
-						clip-path="url(#myCircle)"
+						clip-path="url(#location-pin)"
 						x="327"
 						y="381"
 					/>
 					<text x="380" y="430">Tadlac Lake</text>
 				</svg>
-				<!-- <canvas id="map" width="400" height="400"></canvas> -->
 			</div>
-			<div id="bar-graph-container">
+			<div id="bar-chart-container">
 				<canvas
-					id="bar-graph"
+					id="bar-chart"
 					style="position: relative; height: 65vh; width: 40vw"
 				></canvas>
 			</div>
 		</section>
+		<section class="container my-4">
+			<div id="line-chart-container">
+				<canvas
+					id="line-chart"
+					style="position: relative; height: 50vh; width: 70vw"
+				></canvas>
+			</div>
+			<div class="dropdown d-flex justify-content-center my-4">
+				<button class="btn btn-outline-primary" id="play-btn">
+					Play
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						fill="currentColor"
+						class="bi bi-play-fill mb-1"
+						viewBox="0 0 16 16"
+					>
+						<path
+							d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"
+						/>
+					</svg>
+				</button>
+			</div>
+		</section>
 		<hr class="my-4" />
 	</body>
-	<script>
-		// RENDER BAR GRAPH
-		const labels = ["Sensor 1", "Sensor 2", "Sensor 3"];
-		const data = {
-			labels: labels,
-			datasets: [
-				{
-					label: "Ph Level",
-					data: [65, 59, 80],
-					backgroundColor: [
-						"rgba(136, 200, 247, 0.2)",
-						"rgba(17, 146, 238, 0.2)",
-						"rgba(12, 102, 167, 0.2)",
-					],
-					borderColor: [
-						"rgb(136, 200, 247)",
-						"rgb(17, 146, 238)",
-						"rgb(12, 102, 167)",
-					],
-					borderWidth: 1,
-				},
-			],
-		};
-
-		const config = {
-			type: "bar",
-			data: data,
-			options: {
-				scales: {
-					y: {
-						beginAtZero: true,
-					},
-				},
-			},
-		};
-
-		const myChart = new Chart(document.getElementById("bar-graph"), config);
-	</script>
 	<script src="index.js"></script>
 </html>

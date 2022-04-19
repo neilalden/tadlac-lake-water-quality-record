@@ -13,17 +13,30 @@ hr {
 	background-image: linear-gradient(to right, #fff, rgba(0, 0, 0, 0.75), #fff);
 }
 text {
-	fill: #fff;
+	fill: #2a2a2a;
 	font-size: 32px;
 	font-weight: 500;
-	stroke: #2a2a2a;
+	stroke: #fff;
 	stroke-width: 1px;
 	stroke-linecap: butt;
 	stroke-linejoin: miter;
 	paint-order: stroke;
 }
+.area-text {
+	fill: #2a2a2a;
+	font-size: 38px;
+	font-weight: 500;
+	stroke: #fff;
+	stroke-width: 1px;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	paint-order: stroke;
+	visibility: hidden;
+	transition: linear 0.5s;
+}
+
 stop {
-	transition: 0.4s ease-in-out;
+	transition: linear 0.4s;
 }
 ::-webkit-scrollbar {
 	width: 10px !important;
@@ -36,10 +49,11 @@ stop {
 	background: #0c66a7;
 }
 #jumbotron {
-	background: url("assets/bg.jpg");
-	background-position: center;
+	background: url("assets/bg 1.jpg");
+	background-position: center !important;
 	background-repeat: no-repeat;
 	background-size: cover;
+	background-attachment: fixed;
 	height: 300px;
 }
 #jumbotron > p,
@@ -56,6 +70,7 @@ h1 {
 #line-chart {
 	min-height: 300px !important;
 	max-height: 400px !important;
+	cursor: pointer;
 }
 #dropdownMenu {
 	background: #e3f2fd;
@@ -85,19 +100,19 @@ h1 {
 	justify-content: center;
 	max-width: 600px;
 }
-#sensor-1 {
+#area-1 {
 	fill: url(#grad1);
 }
-#sensor-2 {
+#area-2 {
 	fill: url(#grad2);
 }
 
-#sensor-3 {
+#area-3 {
 	fill: url(#grad3);
 }
 path {
 	cursor: pointer;
-	transition: 0.4s ease-out !important;
+	transition: linear 0.4s !important;
 }
 path:hover {
 	stroke: #000;

@@ -26,22 +26,23 @@ const lineChart = document.getElementById("line-chart") as HTMLCanvasElement;
 const dropdownMenuSelected = document.getElementById(
 	"dropdown-menu-selected",
 ) as HTMLSpanElement;
-const sensor1Stop0 = document.getElementById("sensor1-stop-0") as HTMLElement;
-const sensor2Stop0 = document.getElementById("sensor2-stop-0") as HTMLElement;
-const sensor3Stop0 = document.getElementById("sensor3-stop-0") as HTMLElement;
-const sensor1Stop10 = document.getElementById("sensor1-stop-10") as HTMLElement;
-const sensor2Stop10 = document.getElementById("sensor2-stop-10") as HTMLElement;
-const sensor3Stop10 = document.getElementById("sensor3-stop-10") as HTMLElement;
-const clickable = document.getElementsByClassName(
+const area1Stop0 = document.getElementById("area1-stop-0") as HTMLElement;
+const area2Stop0 = document.getElementById("area2-stop-0") as HTMLElement;
+const area3Stop0 = document.getElementById("area3-stop-0") as HTMLElement;
+const area1Stop10 = document.getElementById("area1-stop-10") as HTMLElement;
+const area2Stop10 = document.getElementById("area2-stop-10") as HTMLElement;
+const area3Stop10 = document.getElementById("area3-stop-10") as HTMLElement;
+const clickables = document.getElementsByClassName(
 	"clickable",
 ) as HTMLCollection;
+const svgPaths = document.getElementsByTagName("path") as HTMLCollection;
 
 // CONSTANTS
 const ANIMATIONSPEED = 500;
 const DAYS = 14;
 const TEMPERATURE: ParameterType = {
 	name: "Temperature",
-	minVal: 15,
+	minVal: 20,
 	maxVal: 30,
 };
 const PHLEVEL: ParameterType = {
@@ -68,7 +69,7 @@ let parameterTemp: string;
 
 // SIDE EFFECT FUNCTIONS
 const renderBarChart = (parameter: string, dataArr: number[]): void => {
-	const labels = ["Sensor 1", "Sensor 2", "Sensor 3"];
+	const labels = ["Area 1", "Area 2", "Area 3"];
 	const data = {
 		labels: labels,
 		datasets: [
@@ -112,32 +113,32 @@ const renderBarChart = (parameter: string, dataArr: number[]): void => {
 const renderLineChart = (
 	parameter: string,
 	dataArr: number[][],
-	index: number = null,
+	index: number,
 ): void => {
-	const sensor1 = dataArr.map((i) => i[0]);
-	const sensor2 = dataArr.map((i) => i[1]);
-	const sensor3 = dataArr.map((i) => i[2]);
+	const area1 = dataArr.map((i) => i[0]);
+	const area2 = dataArr.map((i) => i[1]);
+	const area3 = dataArr.map((i) => i[2]);
 	const labels = dataArr.map((i, index) => `Day ${index + 1}`);
 	const data = {
 		labels: labels,
 		datasets: [
 			{
-				label: `Sensor 1 ${parameter}`,
-				data: sensor1,
+				label: `Area 1 ${parameter}`,
+				data: area1,
 				fill: false,
 				borderColor: "rgb(136, 200, 247)",
 				tension: 0.2,
 			},
 			{
-				label: `Sensor 2 ${parameter}`,
-				data: sensor2,
+				label: `Area 2 ${parameter}`,
+				data: area2,
 				fill: false,
 				borderColor: "rgb(17, 146, 238)",
 				tension: 0.2,
 			},
 			{
-				label: `Sensor 3 ${parameter}`,
-				data: sensor3,
+				label: `Area 3 ${parameter}`,
+				data: area3,
 				fill: false,
 				borderColor: "rgb(12, 102, 167)",
 				tension: 0.2,
@@ -146,6 +147,8 @@ const renderLineChart = (
 	};
 	const options = {
 		animation: false,
+		events: ["click"],
+		onClick: (e) => lineChartClick(e),
 		plugins: {
 			autocolors: false,
 			annotation: {
@@ -201,66 +204,84 @@ const selectParameter = (e: any): void => {
 		);
 	parameterTemp = text;
 	dataTemp = dummyData;
-	renderBarChart(text, dummyData[0]);
-	renderLineChart(text, dummyData);
+	renderLineChart(text, dummyData, DAYS - 1);
+	renderBarChart(text, dummyData[DAYS - 1]);
+	animateMap(dataTemp[DAYS - 1]);
 };
 const disableClickables = (isClickable: boolean): void => {
-	for (let i = 0; i < clickable.length; i++) {
-		(clickable[i] as HTMLButtonElement).disabled = isClickable;
-	}
+	Array.from(clickables).forEach(
+		(clickable) => ((clickable as HTMLButtonElement).disabled = isClickable),
+	);
 };
 const animateMap = (data: number[]): void => {
 	const COLOR0 = ["#b3b300", "#b39800", "#b37400", "#b33000", "#800000"];
 	const COLOR10 = ["yellow", "gold", "orange", "#ff4500", "red"];
-	let sensor1Stop0Color,
-		sensor2Stop0Color,
-		sensor3Stop0Color,
-		sensor1Stop10Color,
-		sensor2Stop10Color,
-		sensor3Stop10Color: string;
+	let area1Stop0Color,
+		area2Stop0Color,
+		area3Stop0Color,
+		area1Stop10Color,
+		area2Stop10Color,
+		area3Stop10Color: string;
 	for (let i = 15, j = 0; i <= 30; i += 3, j++) {
+		// this logic is up for debate, i may be confused
+		if (j >= COLOR0.length) j--;
 		if (i < data[0]) {
-			sensor1Stop0Color = COLOR0[j];
-			sensor1Stop10Color = COLOR10[j];
+			area1Stop0Color = COLOR0[j];
+			area1Stop10Color = COLOR10[j];
 		}
 		if (i < data[1]) {
-			sensor2Stop0Color = COLOR0[j];
-			sensor2Stop10Color = COLOR10[j];
+			area2Stop0Color = COLOR0[j];
+			area2Stop10Color = COLOR10[j];
 		}
 		if (i < data[2]) {
-			sensor3Stop0Color = COLOR0[j];
-			sensor3Stop10Color = COLOR10[j];
+			area3Stop0Color = COLOR0[j];
+			area3Stop10Color = COLOR10[j];
 		}
 	}
-	if (data[0] >= 30) {
-		sensor1Stop0Color = COLOR0[COLOR0.length - 1];
-		sensor1Stop10Color = COLOR10[COLOR10.length - 1];
-	}
-	if (data[1] >= 30) {
-		sensor2Stop0Color = COLOR0[COLOR0.length - 1];
-		sensor2Stop10Color = COLOR10[COLOR10.length - 1];
-	}
-	if (data[2] >= 30) {
-		sensor3Stop0Color = COLOR0[COLOR0.length - 1];
-		sensor3Stop10Color = COLOR10[COLOR10.length - 1];
-	}
-	sensor1Stop0.setAttribute("style", `stop-color: ${sensor1Stop0Color}`);
-	sensor2Stop0.setAttribute("style", `stop-color: ${sensor2Stop0Color}`);
-	sensor3Stop0.setAttribute("style", `stop-color: ${sensor3Stop0Color}`);
-	sensor1Stop10.setAttribute("style", `stop-color: ${sensor1Stop10Color}`);
-	sensor2Stop10.setAttribute("style", `stop-color: ${sensor2Stop10Color}`);
-	sensor3Stop10.setAttribute("style", `stop-color: ${sensor3Stop10Color}`);
+	// if (data[0] >= 30) {
+	// 	area1Stop0Color = COLOR0[COLOR0.length - 1];
+	// 	area1Stop10Color = COLOR10[COLOR10.length - 1];
+	// }
+	// if (data[1] >= 30) {
+	// 	area2Stop0Color = COLOR0[COLOR0.length - 1];
+	// 	area2Stop10Color = COLOR10[COLOR10.length - 1];
+	// }
+	// if (data[2] >= 30) {
+	// 	area3Stop0Color = COLOR0[COLOR0.length - 1];
+	// 	area3Stop10Color = COLOR10[COLOR10.length - 1];
+	// }
+	area1Stop0.setAttribute("style", `stop-color: ${area1Stop0Color}`);
+	area2Stop0.setAttribute("style", `stop-color: ${area2Stop0Color}`);
+	area3Stop0.setAttribute("style", `stop-color: ${area3Stop0Color}`);
+	area1Stop10.setAttribute("style", `stop-color: ${area1Stop10Color}`);
+	area2Stop10.setAttribute("style", `stop-color: ${area2Stop10Color}`);
+	area3Stop10.setAttribute("style", `stop-color: ${area3Stop10Color}`);
 };
 const playAnimation = (): void => {
 	disableClickables(true);
 	for (let i = 0; i < DAYS; i++) {
 		setTimeout(() => {
-			animateMap(dataTemp[i]);
 			renderLineChart(parameterTemp, dataTemp, i);
 			renderBarChart(parameterTemp, dataTemp[i]);
+			animateMap(dataTemp[i]);
 			if (i === DAYS - 1) disableClickables(false);
 		}, i * ANIMATIONSPEED);
 	}
+};
+const lineChartClick = (e: any): void => {
+	// @ts-ignore
+	const canvasPosition = Chart.helpers.getRelativePosition(e, lineChartCanvas);
+	const dataX = lineChartCanvas.scales.x.getValueForPixel(canvasPosition.x);
+	// const dataY = lineChartCanvas.scales.y.getValueForPixel(canvasPosition.y);
+	renderLineChart(parameterTemp, dataTemp, dataX);
+	renderBarChart(parameterTemp, dataTemp[dataX]);
+	animateMap(dataTemp[dataX]);
+};
+const svgPathMouseOver = (i: number): void => {
+	document.getElementById(`area-text-${i + 1}`).style.visibility = "visible";
+};
+const svgPathMouseLeave = (i: number): void => {
+	document.getElementById(`area-text-${i + 1}`).style.visibility = "hidden";
 };
 
 // FRUITFUL FUNCTIONS
@@ -271,13 +292,13 @@ const generateDailyDummyData = (
 ): number[][] => {
 	const arr: number[][] = [];
 	for (let i = 0; i < days; i++) {
-		const sensor1 = Math.random() * (max - min + 1) + min;
-		const sensor2 = Math.random() * (max - min + 1) + min;
-		const sensor3 = Math.random() * (max - min + 1) + min;
+		const area1 = Math.random() * (max - min + 1) + min;
+		const area2 = Math.random() * (max - min + 1) + min;
+		const area3 = Math.random() * (max - min + 1) + min;
 		arr.push([
-			parseFloat(sensor1.toFixed(2)),
-			parseFloat(sensor2.toFixed(2)),
-			parseFloat(sensor3.toFixed(2)),
+			parseFloat(area1.toFixed(2)),
+			parseFloat(area2.toFixed(2)),
+			parseFloat(area3.toFixed(2)),
 		]);
 	}
 	return arr;
@@ -292,11 +313,16 @@ window.addEventListener("load", (e) => {
 	);
 	parameterTemp = TEMPERATURE.name;
 	dataTemp = dummyData;
-	renderBarChart(TEMPERATURE.name, dummyData[0]);
-	renderLineChart(TEMPERATURE.name, dummyData);
+	renderLineChart(TEMPERATURE.name, dummyData, DAYS - 1);
+	renderBarChart(TEMPERATURE.name, dummyData[DAYS - 1]);
+	animateMap(dummyData[DAYS - 1]);
 });
 playBtn.addEventListener("click", playAnimation);
 dropdownItemTemperature.addEventListener("click", (e) => selectParameter(e));
 dropdownItemPHLevel.addEventListener("click", (e) => selectParameter(e));
 dropdownItemAmmoniaLevel.addEventListener("click", (e) => selectParameter(e));
 dropdownItemOxygenLevel.addEventListener("click", (e) => selectParameter(e));
+Array.from(svgPaths).forEach((svgPath, index) => {
+	svgPath.addEventListener("mouseover", () => svgPathMouseOver(index));
+	svgPath.addEventListener("mouseleave", () => svgPathMouseLeave(index));
+});

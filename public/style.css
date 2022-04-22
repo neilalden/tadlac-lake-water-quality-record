@@ -15,26 +15,19 @@ hr {
 text {
 	fill: #2a2a2a;
 	font-size: 32px;
-	font-weight: 500;
-	stroke: #fff;
-	stroke-width: 1px;
-	stroke-linecap: butt;
-	stroke-linejoin: miter;
-	paint-order: stroke;
+	font-weight: bold !important;
+	/* stroke: #fff;
+	stroke-width: 0.5px;
+	paint-order: stroke; */
 }
 .area-text {
-	fill: #2a2a2a;
 	font-size: 38px;
-	font-weight: 500;
-	stroke: #fff;
-	stroke-width: 1px;
-	stroke-linecap: butt;
-	stroke-linejoin: miter;
-	paint-order: stroke;
 	visibility: hidden;
 	transition: linear 0.5s;
 }
-
+.bar-text {
+	font-size: 8px;
+}
 stop {
 	transition: linear 0.4s;
 }
@@ -94,6 +87,13 @@ h1 {
 	display: flex;
 	justify-content: center;
 }
+
+#bar-scale {
+	fill: url(#linear-grad);
+	height: 350px !important;
+	width: 25px !important;
+	align-self: center;
+}
 #bar-chart-container {
 	margin: auto;
 	display: flex;
@@ -134,6 +134,7 @@ path:hover {
 	}
 	#bar-chart {
 		width: 55vw !important;
+		height: 300px !important;
 	}
 	#jumbotron {
 		height: 500px;
@@ -144,6 +145,10 @@ path:hover {
 		margin: auto;
 		display: flex;
 		justify-content: center;
+	}
+
+	#bar-scale {
+		height: 300px !important;
 	}
 	#map-container {
 		height: 300px;

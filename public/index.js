@@ -6,6 +6,7 @@ const dropdownItemPHLevel = document.getElementById("dropdown-item-ph-level");
 const dropdownItemAmmoniaLevel = document.getElementById("dropdown-item-ammonia-level");
 const dropdownItemOxygenLevel = document.getElementById("dropdown-item-oxygen-level");
 const playBtn = document.getElementById("play-btn");
+const datePicker = document.getElementById("date-picker");
 const dropdownMenuSelected = document.getElementById("dropdown-menu-selected");
 const barChart = document.getElementById("bar-chart");
 const lineChart = document.getElementById("line-chart");
@@ -20,7 +21,7 @@ const svgPaths = document.getElementsByTagName("path");
 const barScaleUnits = document.getElementsByClassName("bar-text");
 // CONSTANTS
 const ANIMATIONSPEED = 500;
-const DAYS = 14;
+const DAYS = 5;
 const MONTHS = [
     "Jan",
     "Feb",
@@ -63,33 +64,127 @@ const TEMPERATURE = {
     name: "Temperature",
     minVal: 0,
     maxVal: 30,
-    scaleInterval: 6,
+    scaleInterval: 3,
 };
 const PHLEVEL = {
     name: "pH level",
     minVal: 0,
     maxVal: 10,
-    scaleInterval: 2,
+    scaleInterval: 1,
 };
 const AMMONIALEVEL = {
     name: "Ammonia level",
     minVal: 0,
     maxVal: 8,
-    scaleInterval: 1.6,
+    scaleInterval: 0.8,
 };
 const OXYGENLEVEL = {
     name: "Oxygen level",
     minVal: 0,
     maxVal: 10,
-    scaleInterval: 2,
+    scaleInterval: 1,
 };
 // SIDE EFFECT VARIABLES
 let barChartCanvas;
 let lineChartCanvas;
-let parameterState;
 // STATE VARIABLES
-const dataState = {};
+let parameterGlobalState;
+let dateGlobalState;
+let dataGlobalState = {};
+let lineChartXLabelGlobalState;
 // SIDE EFFECT FUNCTIONS
+const renderMap = (parameter, data) => {
+    let area1Stop0Color, area2Stop0Color, area3Stop0Color, area1Stop10Color, area2Stop10Color, area3Stop10Color;
+    for (let i = parameter.minVal, j = 0; i <= parameter.maxVal; i += parameter.scaleInterval, j += 1) {
+        // this logic is up for debate, i may be confused
+        if (i >= parameter.maxVal)
+            j -= 1;
+        if (i <= data[0]) {
+            area1Stop0Color = COLOR0[j];
+            area1Stop10Color = COLOR10[j];
+        }
+        if (i <= data[1]) {
+            area2Stop0Color = COLOR0[j];
+            area2Stop10Color = COLOR10[j];
+        }
+        if (i <= data[2]) {
+            area3Stop0Color = COLOR0[j];
+            area3Stop10Color = COLOR10[j];
+        }
+    }
+    area1Stop0.setAttribute("style", `stop-color: ${area1Stop0Color ? area1Stop0Color : "#9cc0fa"}`);
+    area2Stop0.setAttribute("style", `stop-color: ${area2Stop0Color ? area2Stop0Color : "#9cc0fa"}`);
+    area3Stop0.setAttribute("style", `stop-color: ${area3Stop0Color ? area3Stop0Color : "#9cc0fa"}`);
+    area1Stop10.setAttribute("style", `stop-color: ${area1Stop10Color ? area1Stop10Color : "#9cc0fa"}`);
+    area2Stop10.setAttribute("style", `stop-color: ${area2Stop10Color ? area2Stop10Color : "#9cc0fa"}`);
+    area3Stop10.setAttribute("style", `stop-color: ${area3Stop10Color ? area3Stop10Color : "#9cc0fa"}`);
+};
+const renderLineChart = (parameter, data, index, date) => {
+    const parameterName = parameter.name === TEMPERATURE.name
+        ? parameter.name + " °C"
+        : parameter.name;
+    const area1 = data.map((i) => i[0]);
+    const area2 = data.map((i) => i[1]);
+    const area3 = data.map((i) => i[2]);
+    const chartData = {
+        labels: date,
+        datasets: [
+            {
+                label: `Area 1 ${parameterName}`,
+                data: area1,
+                fill: false,
+                borderColor: "rgb(136, 200, 247)",
+                tension: 0.2,
+            },
+            {
+                label: `Area 2 ${parameterName}`,
+                data: area2,
+                fill: false,
+                borderColor: "rgb(17, 146, 238)",
+                tension: 0.2,
+            },
+            {
+                label: `Area 3 ${parameterName}`,
+                data: area3,
+                fill: false,
+                borderColor: "rgb(12, 102, 167)",
+                tension: 0.2,
+            },
+        ],
+    };
+    const options = {
+        animation: false,
+        events: ["click"],
+        onClick: (e) => lineChartClick(e, parameter, data, date),
+        plugins: {
+            autocolors: false,
+            annotation: {
+                annotations: {
+                    line1: {
+                        type: "line",
+                        mode: "vertical",
+                        xMin: index != null ? index : data.length - 1,
+                        xMax: index != null ? index : data.length - 1,
+                        borderColor: "red",
+                        borderWidth: 3,
+                    },
+                },
+            },
+        },
+    };
+    const config = {
+        type: "line",
+        data: chartData,
+        options,
+    };
+    if (lineChartCanvas) {
+        lineChartCanvas.destroy();
+        lineChart.style.height = "38.1vh";
+        lineChart.style.width = "40vw";
+    }
+    // @ts-ignore
+    lineChartCanvas = new Chart(lineChart, config);
+};
 const renderBarChart = (parameter, data) => {
     const parameterName = parameter.name === TEMPERATURE.name
         ? parameter.name + " °C"
@@ -135,158 +230,79 @@ const renderBarChart = (parameter, data) => {
     // @ts-ignore
     barChartCanvas = new Chart(barChart, config);
 };
-const renderLineChart = (parameter, data, index, date = null) => {
-    const parameterName = parameter.name === TEMPERATURE.name
-        ? parameter.name + " °C"
-        : parameter.name;
-    const area1 = data.map((i) => i[0]);
-    const area2 = data.map((i) => i[1]);
-    const area3 = data.map((i) => i[2]);
-    const labels = data.map((i, index) => `Day ${index + 1}`);
-    const chartData = {
-        labels: date ? date : labels,
-        datasets: [
-            {
-                label: `Area 1 ${parameterName}`,
-                data: area1,
-                fill: false,
-                borderColor: "rgb(136, 200, 247)",
-                tension: 0.2,
-            },
-            {
-                label: `Area 2 ${parameterName}`,
-                data: area2,
-                fill: false,
-                borderColor: "rgb(17, 146, 238)",
-                tension: 0.2,
-            },
-            {
-                label: `Area 3 ${parameterName}`,
-                data: area3,
-                fill: false,
-                borderColor: "rgb(12, 102, 167)",
-                tension: 0.2,
-            },
-        ],
-    };
-    const options = {
-        animation: false,
-        events: ["click"],
-        onClick: (e) => lineChartClick(e, parameter, data),
-        plugins: {
-            autocolors: false,
-            legend: {
-                display: false,
-                events: [],
-            },
-            annotation: {
-                annotations: {
-                    line1: {
-                        type: "line",
-                        mode: "vertical",
-                        xMin: index != null ? index : data.length - 1,
-                        xMax: index != null ? index : data.length - 1,
-                        borderColor: "red",
-                        borderWidth: 3,
-                    },
-                },
-            },
-        },
-    };
-    const config = {
-        type: "line",
-        data: chartData,
-        options,
-    };
-    if (lineChartCanvas) {
-        lineChartCanvas.destroy();
-        lineChart.style.height = "38.1vh";
-        lineChart.style.width = "40vw";
-    }
-    // @ts-ignore
-    lineChartCanvas = new Chart(lineChart, config);
-};
-const renderMap = (parameter, data) => {
-    let area1Stop0Color, area2Stop0Color, area3Stop0Color, area1Stop10Color, area2Stop10Color, area3Stop10Color;
-    for (let i = parameter.minVal, j = 1; i <= parameter.maxVal; i += parameter.scaleInterval, j += 2) {
-        // this logic is up for debate, i may be confused
-        if (i >= parameter.maxVal)
-            j -= 2;
-        if (i < data[0]) {
-            area1Stop0Color = COLOR0[j];
-            area1Stop10Color = COLOR10[j];
-        }
-        if (i < data[1]) {
-            area2Stop0Color = COLOR0[j];
-            area2Stop10Color = COLOR10[j];
-        }
-        if (i < data[2]) {
-            area3Stop0Color = COLOR0[j];
-            area3Stop10Color = COLOR10[j];
-        }
-    }
-    area1Stop0.setAttribute("style", `stop-color: ${area1Stop0Color ? area1Stop0Color : "#9cc0fa"}`);
-    area2Stop0.setAttribute("style", `stop-color: ${area2Stop0Color ? area2Stop0Color : "#9cc0fa"}`);
-    area3Stop0.setAttribute("style", `stop-color: ${area3Stop0Color ? area3Stop0Color : "#9cc0fa"}`);
-    area1Stop10.setAttribute("style", `stop-color: ${area1Stop10Color ? area1Stop10Color : "#9cc0fa"}`);
-    area2Stop10.setAttribute("style", `stop-color: ${area2Stop10Color ? area2Stop10Color : "#9cc0fa"}`);
-    area3Stop10.setAttribute("style", `stop-color: ${area3Stop10Color ? area3Stop10Color : "#9cc0fa"}`);
-};
 const renderBarScale = (parameter) => {
-    for (let i = parameter.minVal + parameter.scaleInterval, j = 0; i <= parameter.maxVal; i += parameter.scaleInterval, j++)
-        document.getElementById(`bar-text-${j + 1}`).textContent = i.toFixed(2);
+    for (let i = parameter.minVal, j = 0; i <= parameter.maxVal; i += parameter.scaleInterval * 2, j++) {
+        const element = document.getElementById(`bar-text-${j}`);
+        if (element)
+            element.textContent = i.toFixed(2);
+    }
 };
-const renderAll = (parameter, data, i, date = null) => {
-    renderLineChart(parameter, data, i, date);
-    renderBarChart(parameter, data[i]);
-    renderMap(parameter, data[i]);
+const renderAll = (parameter, data, index, date) => {
+    renderLineChart(parameter, data, index, date);
+    renderBarChart(parameter, data[index]);
+    renderMap(parameter, data[index]);
     renderBarScale(parameter);
 };
-const lineChartClick = (e, parameter, data) => {
+// requires global state
+const lineChartClick = (e, parameter, data, date) => {
     // @ts-ignore
     const canvasPosition = Chart.helpers.getRelativePosition(e, lineChartCanvas);
     const dataX = lineChartCanvas.scales.x.getValueForPixel(canvasPosition.x);
     // const dataY = lineChartCanvas.scales.y.getValueForPixel(canvasPosition.y);
-    renderAll(parameter, data, dataX);
+    renderAll(parameter, data, dataX, date);
 };
-// selectParameter && playAnimation requires global state
 const selectParameter = async (e) => {
+    const data = [];
+    const lineChartXLabel = [];
     const text = e.target.innerText;
     let fetchedData;
-    const data = [];
     dropdownMenuSelected.innerText = text;
     if (TEMPERATURE.name === text)
-        parameterState = TEMPERATURE;
+        parameterGlobalState = TEMPERATURE;
     if (PHLEVEL.name === text)
-        parameterState = PHLEVEL;
+        parameterGlobalState = PHLEVEL;
     if (AMMONIALEVEL.name === text)
-        parameterState = AMMONIALEVEL;
+        parameterGlobalState = AMMONIALEVEL;
     if (OXYGENLEVEL.name === text)
-        parameterState = OXYGENLEVEL;
-    const key = parameterState.name;
-    if (!dataState[key]) {
-        fetchedData = await fetchData(parameterState, DAYS);
+        parameterGlobalState = OXYGENLEVEL;
+    const key = parameterGlobalState.name + dateGlobalState;
+    if (!dataGlobalState[key]) {
+        const date = new Date(dateGlobalState);
+        const to = new Date(date.setDate(date.getDate() + Math.round(DAYS / 2) - 1));
+        const from = new Date(date.setDate(date.getDate() - Math.round(DAYS / 2) - 2));
+        fetchedData = await fetchData(parameterGlobalState, DAYS, from, to);
         fetchedData.map((item) => {
+            const date = item.timeGathered.toDate();
+            const day = date.getDate();
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            lineChartXLabel.unshift(`${MONTHS[month]}/${day}/${year}`);
             data.push([item.area1, item.area2, item.area3]);
         });
     }
     else {
-        dataState[key].map((item) => {
+        dataGlobalState[key].map((item) => {
+            const date = item.timeGathered.toDate();
+            const day = date.getDate();
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            lineChartXLabel.unshift(`${MONTHS[month]}/${day}/${year}`);
             data.push([item.area1, item.area2, item.area3]);
         });
     }
-    renderAll(parameterState, data, data.length - 1);
+    lineChartXLabelGlobalState = lineChartXLabel;
+    renderAll(parameterGlobalState, data, data.length == 5 ? Math.round(data.length / 2) - 1 : data.length - 1, lineChartXLabelGlobalState);
 };
 const playAnimation = () => {
-    const key = parameterState.name;
+    const key = parameterGlobalState.name + dateGlobalState;
     const data = [];
-    dataState[key].map((item, index) => {
+    dataGlobalState[key].map((item, index) => {
         data.push([item.area1, item.area2, item.area3]);
     });
     for (let i = 0; i < data.length; i++) {
         disableClickables(true);
         setTimeout(() => {
-            renderAll(parameterState, data, i);
+            renderAll(parameterGlobalState, data, i, lineChartXLabelGlobalState);
             if (i === data.length - 1)
                 disableClickables(false);
         }, i * ANIMATIONSPEED);
@@ -301,10 +317,12 @@ const svgPathMouseOver = (i) => {
 const svgPathMouseLeave = (i) => {
     document.getElementById(`area-text-${i + 1}`).style.visibility = "hidden";
 };
-const fetchData = async (parameter, days) => {
+const fetchData = async (parameter, days, from, to) => {
     const records = await firestore
         .collection("records")
         .where("parameter", "==", parameter.name)
+        .where("timeGathered", ">=", from)
+        .where("timeGathered", "<=", to)
         .orderBy("timeGathered", "desc")
         .limit(days)
         .get();
@@ -312,19 +330,27 @@ const fetchData = async (parameter, days) => {
     records.forEach((doc) => {
         arr.push(doc.data());
     });
+    if (arr.length === 0)
+        document.getElementsByClassName("alert")[0].classList.add("show");
     return arr;
 };
 // EVENT LISTENERS
 window.addEventListener("load", async (e) => {
-    const fetchedData = await fetchData(TEMPERATURE, DAYS);
-    // UPDATE GLOBAL STATE
-    parameterState = TEMPERATURE;
-    const key = parameterState.name;
-    dataState[key] = fetchedData;
+    // @ts-ignore
+    document
+        .getElementsByClassName("btn-close")[0]
+        .addEventListener("click", () => {
+        document.getElementsByClassName("alert")[0].classList.remove("show");
+    });
+    const date = new Date("2022-04-13");
+    datePicker.max = new Date().toISOString().split("T")[0];
+    datePicker.valueAsDate = date;
+    const to = new Date(date.setDate(date.getDate() + Math.round(DAYS / 2) - 1));
+    const from = new Date(date.setDate(date.getDate() - Math.round(DAYS / 2) - 2));
+    const fetchedData = await fetchData(TEMPERATURE, DAYS, from, to);
     const lineChartXLabel = [];
     const data = [];
     fetchedData.map((item, index) => {
-        data.push([item.area1, item.area2, item.area3]);
         const date = item.timeGathered.toDate();
         const day = date.getDate();
         const month = date.getMonth();
@@ -334,34 +360,43 @@ window.addEventListener("load", async (e) => {
         // const ampm = hour > 12 ? "pm" : "am";
         // `${hour > 12 ? hour - 12 : hour}:${minute} ${ampm}`;
         lineChartXLabel.unshift(`${MONTHS[month]}/${day}/${year}`);
+        data.push([item.area1, item.area2, item.area3]);
     });
-    renderAll(TEMPERATURE, data, data.length - 1, lineChartXLabel);
+    // UPDATE GLOBAL STATE
+    dateGlobalState = new Date("2022-04-13");
+    const key = TEMPERATURE.name + dateGlobalState;
+    dataGlobalState[key] = fetchedData;
+    parameterGlobalState = TEMPERATURE;
+    lineChartXLabelGlobalState = lineChartXLabel;
+    renderAll(TEMPERATURE, data, data.length == 5 ? Math.round(data.length / 2) - 1 : data.length - 1, lineChartXLabel);
 });
 Array.from(svgPaths).forEach((svgPath, index) => {
     svgPath.addEventListener("mouseover", () => svgPathMouseOver(index));
     svgPath.addEventListener("mouseleave", () => svgPathMouseLeave(index));
 });
-playBtn.addEventListener("click", playAnimation);
+datePicker.addEventListener("change", async (e) => {
+    const date = new Date(e.target.value);
+    const to = new Date(date.setDate(date.getDate() + Math.round(DAYS / 2) - 1));
+    const from = new Date(date.setDate(date.getDate() - Math.round(DAYS / 2) - 2));
+    const fetchedData = await fetchData(parameterGlobalState, DAYS, from, to);
+    const lineChartXLabel = [];
+    const data = [];
+    fetchedData.map((item, index) => {
+        const date = item.timeGathered.toDate();
+        const day = date.getDate();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        lineChartXLabel.unshift(`${MONTHS[month]}/${day}/${year}`);
+        data.push([item.area1, item.area2, item.area3]);
+    });
+    dateGlobalState = new Date(e.target.value);
+    const key = parameterGlobalState.name + dateGlobalState;
+    dataGlobalState[key] = fetchedData;
+    lineChartXLabelGlobalState = lineChartXLabel;
+    renderAll(parameterGlobalState, data, data.length == 5 ? Math.round(data.length / 2) - 1 : data.length - 1, lineChartXLabel);
+});
 dropdownItemTemperature.addEventListener("click", (e) => selectParameter(e));
 dropdownItemPHLevel.addEventListener("click", (e) => selectParameter(e));
 dropdownItemAmmoniaLevel.addEventListener("click", (e) => selectParameter(e));
 dropdownItemOxygenLevel.addEventListener("click", (e) => selectParameter(e));
-// FRUITFUL FUNCTIONS
-// const generateDailyDummyData = (
-// 	days: number,
-// 	min: number,
-// 	max: number,
-// ): number[][] => {
-// 	const arr: number[][] = [];
-// 	for (let i = 0; i < days; i++) {
-// 		const area1 = Math.random() * (max - min + 1) + min;
-// 		const area2 = Math.random() * (max - min + 1) + min;
-// 		const area3 = Math.random() * (max - min + 1) + min;
-// 		arr.push([
-// 			parseFloat(area1.toFixed(2)),
-// 			parseFloat(area2.toFixed(2)),
-// 			parseFloat(area3.toFixed(2)),
-// 		]);
-// 	}
-// 	return arr;
-// };
+playBtn.addEventListener("click", playAnimation);

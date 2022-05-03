@@ -1,1 +1,1 @@
-# https://neilalden.github.io/tadlac-lake-water-quality-record/
+# https://e-sentry.web.app

@@ -13,20 +13,20 @@ hr {
 	background-image: linear-gradient(to right, #fff, rgba(0, 0, 0, 0.75), #fff);
 }
 text {
-	fill: #2a2a2a;
+	fill: #fff;
 	font-size: 32px;
 	font-weight: bold !important;
-	/* stroke: #fff;
-	stroke-width: 0.5px;
-	paint-order: stroke; */
+	stroke: #2a2a2a;
+	stroke-width: 5px;
+	paint-order: stroke;
 }
 .area-text {
-	font-size: 38px;
 	visibility: hidden;
 	transition: linear 0.5s;
 }
 .bar-text {
 	font-size: 8px;
+	stroke-width: 2px;
 }
 stop {
 	transition: linear 0.4s;
@@ -58,11 +58,13 @@ h1 {
 	flex-direction: row;
 }
 #bar-chart {
-	min-width: 300px !important;
+	max-height: 400px !important;
+	min-height: 350px !important;
+	min-width: 350px !important;
 }
 #line-chart {
-	min-height: 300px !important;
-	max-height: 400px !important;
+	min-height: 200px !important;
+	max-height: 300px !important;
 	cursor: pointer;
 }
 #dropdownMenu {
@@ -127,6 +129,17 @@ path:hover {
 .btn-outline-primary:hover {
 	background-color: #e3f2fd !important;
 }
+.alert {
+	z-index: 1 !important;
+	position: fixed !important;
+	width: 100% !important;
+	max-width: 1280px;
+	margin: 10px auto !important;
+	visibility: hidden;
+}
+.show {
+	visibility: visible;
+}
 @media only screen and (max-width: 600px) {
 	#map-bar-container {
 		display: flex;
@@ -155,7 +168,7 @@ path:hover {
 		width: 300px;
 	}
 }
-@media screen and (max-width: 900px) and (min-width: 599px) {
+/* @media screen and (max-width: 1280px) and (min-width: 599px) {
 	#map-bar-container {
 		display: flex;
 		flex-direction: column;
@@ -163,6 +176,6 @@ path:hover {
 	#bar-chart {
 		width: 55vw !important;
 	}
-}
+} */
 @media screen and (max-width: 99999px) and (min-width: 1200px) {
 }

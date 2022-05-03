@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
+		<title>E-Sentry</title>
 		<link rel="shortcut icon" href="assets/tadlak_lake_whole.ico" />
 		<link rel="stylesheet" href="style.css" />
 		<link
@@ -16,6 +16,27 @@
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	</head>
 	<body>
+		<div
+			class="
+				alert alert-danger alert-dismissible
+				fade
+				d-flex
+				justify-content-center
+			"
+			role="alert"
+		>
+			<svg
+				class="bi flex-shrink-0 me-2"
+				width="24"
+				height="24"
+				role="img"
+				aria-label="Danger:"
+			>
+				<use xlink:href="#exclamation-triangle-fill" />
+			</svg>
+			<strong>No Data</strong> &nbsp; for this specific date and parameter.
+			<button type="button" class="btn-close" aria-label="Close"></button>
+		</div>
 		<nav
 			class="navbar navbar-light navbar-expand-lg d-flex justify-content-center"
 			style="background-color: #e3f2fd"
@@ -70,55 +91,61 @@
 				labore dolorum nemo odio possimus veritatis reprehenderit consequatur.
 			</p>
 		</div>
-		<div class="dropdown d-flex justify-content-center mb-4">
-			<button
-				class="btn dropdown-toggle clickable"
-				type="button"
-				id="dropdownMenu"
-				data-bs-toggle="dropdown"
-				aria-expanded="false"
-			>
-				Parameter:
-				<span id="dropdown-menu-selected">Temperature</span>
-			</button>
-			<ul class="dropdown-menu" aria-labelledby="dropdownMenu">
-				<li>
-					<button
-						id="dropdown-item-temperature"
-						class="dropdown-item"
-						type="button"
-					>
-						Temperature
-					</button>
-				</li>
-				<li>
-					<button
-						id="dropdown-item-ph-level"
-						class="dropdown-item"
-						type="button"
-					>
-						pH level
-					</button>
-				</li>
-				<li>
-					<button
-						id="dropdown-item-ammonia-level"
-						class="dropdown-item"
-						type="button"
-					>
-						Ammonia level
-					</button>
-				</li>
-				<li>
-					<button
-						id="dropdown-item-oxygen-level"
-						class="dropdown-item"
-						type="button"
-					>
-						Oxygen level
-					</button>
-				</li>
-			</ul>
+		<div class="container d-flex flex-row justify-content-center pt-4">
+			<div class="dropdown d-flex justify-content-center mb-4 me-4">
+				<button
+					class="btn dropdown-toggle clickable"
+					type="button"
+					id="dropdownMenu"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
+					Parameter:
+					<span id="dropdown-menu-selected">Temperature</span>
+				</button>
+				<ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+					<li>
+						<button
+							id="dropdown-item-temperature"
+							class="dropdown-item"
+							type="button"
+						>
+							Temperature
+						</button>
+					</li>
+					<li>
+						<button
+							id="dropdown-item-ph-level"
+							class="dropdown-item"
+							type="button"
+						>
+							pH level
+						</button>
+					</li>
+					<li>
+						<button
+							id="dropdown-item-ammonia-level"
+							class="dropdown-item"
+							type="button"
+						>
+							Ammonia level
+						</button>
+					</li>
+					<li>
+						<button
+							id="dropdown-item-oxygen-level"
+							class="dropdown-item"
+							type="button"
+						>
+							Oxygen level
+						</button>
+					</li>
+				</ul>
+			</div>
+			<div style="max-width: 200px; transform: translateY(-25px)" class="ms-4">
+				<label for="date-picker" class="form-label mb-0">Select date</label>
+				<input class="form-control" type="date" id="date-picker" />
+			</div>
 		</div>
 		<section
 			id="map-bar-container"
